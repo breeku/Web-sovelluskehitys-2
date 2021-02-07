@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from "react"
 import styles from "./styles.module.css"
 
+import Select from "react-select"
+
+import { MapContainer, TileLayer, Marker } from "react-leaflet"
+
 const Home = () => {
     const [stations, setStations] = useState(null)
+    const [station, setStation] = useState(null)
 
     useEffect(() => {
         ;(async () => {
@@ -13,19 +18,52 @@ const Home = () => {
             setStations(json.features)
         })()
     }, [])
+
+    console.log(station)
     return (
         <div className={styles.text_center}>
             <h1>Kaupunkipyörät</h1>
             {stations ? (
                 <>
-                    {stations.map((station) => (
-                        <>
-                            {station.attributes.Adress}, kapasiteetti:{" "}
-                            {station.attributes.Kapasiteet}. Operaattori:{" "}
-                            {station.attributes.Operaattor}
-                            <br />
-                        </>
-                    ))}
+                    Valitse asema
+                    <Select
+                        options={stations}
+                        getOptionLabel={(option) => option.attributes.Adress}
+                        onChange={(option) => setStation(option)}
+                    />
+                    {station && (
+                        <div
+                            style={{
+                                marginLeft: "auto",
+                                marginRight: "auto",
+                                width: 300,
+                                height: 300,
+                            }}
+                        >
+                            <h2>
+                                Kapasiteetti: {station.attributes.Kapasiteet}
+                            </h2>
+                            <MapContainer
+                                center={[
+                                    station.geometry.y,
+                                    station.geometry.x,
+                                ]}
+                                zoom={13}
+                                scrollWheelZoom={false}
+                            >
+                                <TileLayer
+                                    attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                                    url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+                                />
+                                <Marker
+                                    position={[
+                                        station.geometry.y,
+                                        station.geometry.x,
+                                    ]}
+                                ></Marker>
+                            </MapContainer>
+                        </div>
+                    )}
                 </>
             ) : (
                 <>Loading..</>
