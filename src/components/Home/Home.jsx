@@ -5,23 +5,24 @@ import Select from "react-select"
 
 import { MapContainer, TileLayer, Marker } from "react-leaflet"
 
+import Weather from "../Weather/Weather"
+
+import { getStations } from "../../services/bikes"
+
 const Home = () => {
     const [stations, setStations] = useState(null)
     const [station, setStation] = useState(null)
 
     useEffect(() => {
         ;(async () => {
-            const data = await fetch(
-                "https://services1.arcgis.com/sswNXkUiRoWtrx0t/arcgis/rest/services/Helsingin_ja_Espoon_kaupunkipy%C3%B6r%C3%A4asemat/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
-            )
-            const json = await data.json()
-            setStations(json.features)
+            const data = await getStations()
+            setStations(data)
         })()
     }, [])
 
-    console.log(station)
     return (
         <div className={styles.text_center}>
+            <Weather />
             <h1>Kaupunkipyörät</h1>
             {stations ? (
                 <>
